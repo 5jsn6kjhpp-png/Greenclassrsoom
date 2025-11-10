@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>EcoClass Action — School Hub</title>
+  <style>
+    /* 심플 · 발표/제출용 스타일 (가독성 우선) */
+    :root{ --accent:#15607a; --muted:#666; --card:#f7fbfc; --maxw:1000px; }
+    body{ font-family:"Noto Sans KR",system-ui,Arial; background:#eef6f8; margin:0; display:flex; justify-content:center; padding:20px; color:#111;}
+    .wrap{ width:100%; max-width:var(--maxw); }
+    header{ display:flex; gap:12px; align-items:center; }
+    .logo{ background:var(--accent); color:#fff; padding:10px 14px; border-radius:8px; font-weight:700;}
+    h1{ margin:0; font-size:1.25rem;}
+    p.lead{ margin:4px 0 0 0; color:var(--muted); }
+
+    .grid{ display:grid; grid-template-columns: 1fr 320px; gap:18px; margin-top:16px; }
+    @media(max-width:900px){ .grid{ grid-template-columns:1fr; } .right{ order:2; } }
+
+    .card{ background:var(--card); padding:14px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.04); }
+    .card h2{ margin:0 0 8px 0; color:var(--accent); font-size:1.05rem; }
+    .muted{ color:var(--muted); font-size:0.95rem; }
+
+    .module{ border-radius:8px; padding:10px; background:white; border:1px solid rgba(0,0,0,0.04); margin-bottom:8px; }
+    input, textarea, select, button{ font-family:inherit; font-size:0.95rem; }
+    input[type="text"], input[type="number"], textarea{ width:100%; padding:8px; border-radius:6px; border:1px solid #ddd; box-sizing:border-box; }
+    button{ background:var(--accent); color:white; border:0; padding:8px 10px; border-radius:8px; cursor:pointer; }
+
+    .projects{ margin-top:8px; display:flex; flex-direction:column; gap:8px; max-height:280px; overflow:auto; }
+    .proj{ padding:8px; background:white; border-radius:6px; border:1px dashed rgba(0,0,0,0.05); }
+    footer{ text-align:center; color:var(--muted); margin-top:14px; font-size:0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">EcoClass</div>
+      <div>
+        <h1>EcoClass Action — 학교 기반 기후·생태 실천 허브</h1>
+        <p class="lead">교사·학생이 함께 만드는 프로젝트(제출용)</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <main>
+        <section class="card">
+          <h2>프로젝트 개요</h2>
+          <p class="muted">이 페이지는 '학교 단위 실천'을 목표로 하는 PBL 템플릿, 교사용 자료, 실천 모니터링 도구를 포함합니다. (교육용 데모)</p>
+        </section>
+
+        <section class="card" style="margin-top:12px;">
+          <h2>학생용 — PBL 제출</h2>
+          <div class="module">
+            <label>프로젝트 제목</label>
+            <input id="title" type="text" placeholder="예: 학교 텃밭 물절약 프로젝트">
+            <label style="margin-top:8px;">요약(한두 문장)</label>
+            <textarea id="desc" rows="3" placeholder="무엇을 할 건가요?"></textarea>
+            <label style="margin-top:8px;">학생(또는 학급명)</label>
+            <input id="author" type="text" placeholder="3학년 1반 홍길동">
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <button id="saveProj">제출하기</button>
+              <button id="sampleFill">샘플 자동입력</button>
+            </div>
+            <div class="projects" id="projectList" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section class="card" style="margin-top:12px;">
+          <h2>간이 탄소/자원 계산기 (교육용)</h2>
+          <p class="muted">간단 입력으로 연간 절감 예상량을 보여줍니다 (근사값, 교육 목적).</p>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:200px;">
+              <label>교실 전등 LED 교체 개수</label>
+              <input id="led" type="number" min="0" value="0">
+            </div>
+            <div style="flex:1; min-width:200px;">
+              <label>자가용 대신 대중교통 전환 인원(1일 기준)</label>
+              <input id="trans" type="number" min="0" value="0">
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
+            <button id="calc">계산</button>
+            <div id="calcRes" class="muted">결과가 표시됩니다.</div>
+          </div>
+          <small class="muted">참고: LED 1개 ≒ 연간 20kgCO₂ 절감(근사), 통학 1인 ≒ 500kgCO₂/년 가정(교육용)</small>
+        </section>
+
+        <section class="card" style="margin-top:12px;">
+          <h2>성과 시각화 예시 (활동 전후 비교)</h2>
+          <div class="module">
+            <small class="muted">예: 급식 쓰레기 무게 측정(활동 전/후)</small>
+            <label>활동 전(kg)</label>
+            <input id="before" type="number" min="0" value="10">
+            <label style="margin-top:8px;">활동 후(kg)</label>
+            <input id="after" type="number" min="0" value="7">
+            <div style="margin-top:8px;">
+              <button id="draw">그래프 그리기</button>
+            </div>
+            <canvas id="chart" width="600" height="200" style="max-width:100%; margin-top:8px; background:white; border-radius:6px;"></canvas>
+          </div>
+        </section>
+      </main>
+
+      <aside class="right card">
+        <h2>교사용 · 빠른 자료</h2>
+        <p class="muted">45분 수업안(샘플), 안전 체크리스트, 평가 루브릭을 여기에 첨부하여 수업에 바로 활용하세요.</p>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+          <button onclick="alert('샘플 수업안: 관찰→측정→행동화(45분).')">수업안 보기(샘플)</button>
+          <button onclick="alert('평가 루브릭: 참여·기록·성과 반영')">평가 루브릭</button>
+        </div>
+
+        <div style="margin-top:12px;">
+          <h2>서약(우리 반의 약속)</h2>
+          <input id="pledgeName" type="text" placeholder="학급/이름">
+          <div style="margin-top:8px;">
+            <button id="pledgeBtn">서약 등록</button>
+          </div>
+          <div id="pledgeList" class="muted" style="margin-top:8px;"></div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <h2>간단 출처</h2>
+          <p class="muted">교육 설계 근거: UNESCO · OECD · 한국 기상청·KEEP 교육자료 등</p>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="card" style="margin-top:14px;">
+      제출용 데모 페이지 — 실제 운영 시 <strong>서버 저장·계정 관리·사진 업로드·개인정보 보호</strong>에 대한 추가 개발이 필요합니다.
+    </footer>
+  </div>
+
+<script>
+  // 프로젝트 저장(브라우저 localStorage)
+  const saveBtn = document.getElementById('saveProj');
+  const projectList = document.getElementById('projectList');
+  const title = document.getElementById('title');
+  const desc = document.getElementById('desc');
+  const author = document.getElementById('author');
+
+  function loadProjects(){
+    const raw = localStorage.getItem('ecoprojects');
+    const arr = raw ? JSON.parse(raw) : [];
+    projectList.innerHTML = '';
+    arr.slice().reverse().forEach(p => {
+      const d = document.createElement('div'); d.className='proj';
+      d.innerHTML = `<strong>${escapeHtml(p.title)}</strong><div class="muted">${escapeHtml(p.desc)}</div><div style="font-size:0.85rem;color:#888;margin-top:6px;">작성: ${escapeHtml(p.author)} · ${new Date(p.t).toLocaleString()}</div>`;
+      projectList.appendChild(d);
+    });
+  }
+  saveBtn.addEventListener('click', ()=>{
+    if(!title.value.trim()){ alert('제목을 입력하세요'); return; }
+    const raw = localStorage.getItem('ecoprojects');
+    const arr = raw ? JSON.parse(raw) : [];
+    arr.push({ title: title.value.trim(), desc: desc.value.trim(), author: author.value.trim() || '익명', t: Date.now() });
+    localStorage.setItem('ecoprojects', JSON.stringify(arr));
+    title.value=''; desc.value=''; author.value='';
+    loadProjects();
+  });
+  document.getElementById('sampleFill').addEventListener('click', ()=>{
+    title.value='학교 텃밭 물 절약 캠페인';
+    desc.value='급식 물 절약 실천과 텃밭 관수 개선으로 물 사용량을 줄입니다.';
+    author.value='5학년 2반';
+  });
+  loadProjects();
+
+  // 계산기
+  document.getElementById('calc').addEventListener('click', ()=>{
+    const led = Math.max(0, Number(document.getElementById('led').value) || 0);
+    const trans = Math.max(0, Number(document.getElementById('trans').value) || 0);
+    const ledSaving = led * 20; // kgCO2/yr
+    const transSaving = trans * 500; // kgCO2/yr
+    const total = ledSaving + transSaving;
+    document.getElementById('calcRes').textContent = `예상 연간 절감: ${Math.round(total).toLocaleString()} kgCO₂ (LED:${ledSaving}kg, 통학:${transSaving}kg)`;
+  });
+
+  // 서약
+  const pledgeBtn = document.getElementById('pledgeBtn');
+  const pledgeName = document.getElementById('pledgeName');
+  const pledgeList = document.getElementById('pledgeList');
+  function loadPledge(){
+    const raw = localStorage.getItem('ecopledges');
+    const arr = raw ? JSON.parse(raw) : [];
+    pledgeList.textContent = arr.slice().reverse().join(', ');
+  }
+  pledgeBtn.addEventListener('click', ()=>{
+    const n = pledgeName.value.trim(); if(!n){ alert('이름/학급을 입력하세요'); return; }
+    const raw = localStorage.getItem('ecopledges'); const arr = raw ? JSON.parse(raw) : [];
+    arr.push(n + ' (' + new Date().toLocaleDateString() + ')');
+    localStorage.setItem('ecopledges', JSON.stringify(arr));
+    pledgeName.value=''; loadPledge();
+  });
+  loadPledge();
+
+  // 그래프(간단한 막대)
+  document.getElementById('draw').addEventListener('click', ()=>{
+    const before = Math.max(0, Number(document.getElementById('before').value) || 0);
+    const after = Math.max(0, Number(document.getElementById('after').value) || 0);
+    const canvas = document.getElementById('chart'); const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    // 배경
+    ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    // 막대 그리기
+    const max = Math.max(before, after, 1);
+    const barW = 120;
+    const gap = 50;
+    const left = 80;
+    // before
+    const h1 = (before / max) * 140;
+    const h2 = (after / max) * 140;
+    ctx.fillStyle='#a7d7e7'; ctx.fillRect(left, 170 - h1, barW, h1);
+    ctx.fillStyle='#56a0b3'; ctx.fillRect(left + barW + gap, 170 - h2, barW, h2);
+    ctx.fillStyle='#333'; ctx.fillText('활동 전', left+20, 185);
+    ctx.fillText('활동 후', left+barW+gap+20, 185);
+    ctx.fillStyle='#666'; ctx.fillText(`kg: ${before}`, left+20, 165 - h1);
+    ctx.fillText(`kg: ${after}`, left+barW+gap+20, 165 - h2);
+  });
+
+  // 간단한 HTML 이스케이프
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+</script>
+</body>
+</html>
